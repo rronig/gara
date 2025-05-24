@@ -1,10 +1,11 @@
 <?php
+$server='localhost'
 $dbname='gara';
 $username='root';
 $password='';
-$conn=new mysqli($dbname, $username, $password);
-if ($conn->connect_error){
-    die("connection failed".$conn->connect_error);
-}
+try{
+$conn=new PDO("mysql:host=$server;dbname=$dbname", $username, $password);
+$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 echo 'connected successfully';
+}catch{$e}
 ?>
