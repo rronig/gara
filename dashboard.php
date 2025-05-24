@@ -190,6 +190,7 @@ function fetchSingleValue($pdo, $sql, $params = []) {
                 padding: 1rem;
             }
         }
+        .daw{height:3rem; width:auto;}
     </style>
 </head>
 <body>
@@ -199,13 +200,13 @@ function fetchSingleValue($pdo, $sql, $params = []) {
         <div class="logo-icon">
             <i class="fas fa-landmark"></i>
         </div>
+        <img class="daw" src="kosova1.png" alt="InvestKosovo Logo">
         <div class="logo-text">
-            <h1 >InvestKosovo</h1>
-            <p>Investment Hub</p>
+            <a href="index.php" style="text-decoration:none;">
+                <h1>InvestKosovo</h1>
+                <p>Investment Hub</p>
+            </a>
         </div>
-        <button id="toggleSidebar" title="Toggle sidebar">
-            <i class="fas fa-bars"></i>
-        </button>
     </div>
     <nav>
         <a href="dashboard.php" class="active"><i class="fas fa-tachometer-alt"></i> <span class="nav-text">Dashboard</span></a>
@@ -218,8 +219,12 @@ function fetchSingleValue($pdo, $sql, $params = []) {
 
 <main class="content" id="mainContent">
     <h1>Welcome to InvestKosovo Hub Dashboard</h1>
+        <script>
+            console.log(<?= json_encode($user_type) ?>);
+        </script>
 
     <?php if ($user_type === 'admin'): ?>
+
         <section class="admin-panel">
             <h2>Admin Panel Summary</h2>
             <?php
@@ -337,18 +342,5 @@ function fetchSingleValue($pdo, $sql, $params = []) {
         </section>
     <?php endif; ?>
 </main>
-
-<script>
-    // Sidebar toggle script
-    const toggleBtn = document.getElementById('toggleSidebar');
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-
-    toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        mainContent.classList.toggle('collapsed');
-    });
-</script>
-
 </body>
 </html>

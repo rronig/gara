@@ -86,7 +86,7 @@
                 <div class="flex items-center">
                     <div class="flex-shrink-0 flex items-center">
                         <img class="h-16 w-auto" src="kosova.png" alt="InvestKosovo Logo">
-                        <span class="ml-2 text-xl font-bold text-blue-800">InvestKosovo Hub</span>
+                        <a href="index.php"><span class="ml-2 text-xl font-bold text-blue-800">InvestKosovo Hub</span></a>
                     </div>
                 </div>
                 <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
@@ -135,9 +135,9 @@
                         Your gateway to business opportunities, incentives, and growth in one of Europe's most dynamic emerging markets.
                     </p>
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <button class="bg-white text-blue-800 hover:bg-blue-100 px-6 py-3 rounded-md font-medium transition duration-300">
+                        <a href="opportunities.php" class="bg-white text-blue-800 hover:bg-blue-100 px-6 py-3 rounded-md font-medium transition duration-300">
                             Explore Opportunities <i class="fas fa-search ml-2"></i>
-                        </button>
+                        </a>
                         <button class="bg-transparent border-2 border-white hover:bg-white hover:text-blue-800 px-6 py-3 rounded-md font-medium transition duration-300">
                             Watch Overview <i class="fas fa-play-circle ml-2"></i>
                         </button>

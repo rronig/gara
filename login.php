@@ -2,39 +2,38 @@
 session_start();
 include_once 'config.php';
 
-$errors = [];
-$success = '';
+if (!isset($_SESSION['user_id'])) {
+    $errors = [];
+    $success = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $email = trim($_POST['email']);
+        $password = $_POST['password'];
 
-    if (empty($email) || empty($password)) {
-        $errors[] = "Email and password are required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Invalid email format.";
-    } else {
-        $stmt = $pdo->prepare("SELECT user_id, full_name, password_hash FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
-
-        if ($user && password_verify($password, $user['password_hash'])) {
-            // Update last_login timestamp
-            $update = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?");
-            $update->execute([$user['user_id']]);
-
-            // Start session and store user info
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['full_name'] = $user['full_name'];
-
-            header("Location: dashboard.php"); // Redirect to a logged-in page
-            exit;
+        if (empty($email) || empty($password)) {
+            $errors[] = "Email and password are required.";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Invalid email format.";
         } else {
-            $errors[] = "Invalid email or password.";
+            $stmt = $pdo->prepare("SELECT user_id, full_name, password_hash FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
+
+            if ($user && password_verify($password, $user['password_hash'])) {
+                $update = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?");
+                $update->execute([$user['user_id']]);
+
+                $_SESSION['user_id'] = $user['user_id'];
+                $_SESSION['full_name'] = $user['full_name'];
+
+                header("Location: dashboard.php");
+                exit;
+            } else {
+                $errors[] = "Invalid email or password.";
+            }
         }
     }
-}
-?>
+    ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -88,3 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
+<?php
+} else {
+    // If user is already logged in, redirect to dashboard
+    header("Location: dashboard.php");
+    exit;
+}
+?>
