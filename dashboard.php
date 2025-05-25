@@ -209,8 +209,8 @@ function fetchSingleValue($pdo, $sql, $params = []) {
         </div>
     </div>
     <nav>
-        <a href="dashboard.php" class="active"><i class="fas fa-tachometer-alt"></i> <span class="nav-text">Dashboard</span></a>
-        <a href="profile.php"><i class="fas fa-user"></i> <span class="nav-text">Profile</span></a>
+        <a href="dashboardi.php" class="active"><i class="fas fa-tachometer-alt"></i> <span class="nav-text">Dashboard</span></a>
+        <a href="profilei.php"><i class="fas fa-user"></i> <span class="nav-text">Profile</span></a>
         <a href="opportunities.php"><i class="fas fa-chart-line"></i> <span class="nav-text">Opportunities</span></a>
         <a href="reports.php"><i class="fas fa-file-alt"></i> <span class="nav-text">Reports</span></a>
         <a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span></a>
@@ -291,7 +291,7 @@ function fetchSingleValue($pdo, $sql, $params = []) {
                 <p><strong>Investment Type:</strong> <?= htmlspecialchars($company['investment_type']) ?></p>
                 <p><strong>Location:</strong> <?= htmlspecialchars($company['location']) ?></p>
             <?php else: ?>
-                <p><em>No company profile found. <a href="company_profile.php">Add one here</a>.</em></p>
+                <p><em>No company profile found. <a href="company_profilei.php">Add one here</a>.</em></p>
             <?php endif; ?>
 
             <h3>Recommended Investment Opportunities</h3>

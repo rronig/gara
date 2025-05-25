@@ -234,8 +234,8 @@ $sectors = $pdo->query("SELECT sector_id, name FROM sectors ORDER BY name")->fet
         </div>
     </div>
     <nav>
-        <a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span class="nav-text">Dashboard</span></a>
-        <a href="profile.php"><i class="fas fa-user"></i> <span class="nav-text">Profile</span></a>
+        <a href="dashboardi.php"><i class="fas fa-tachometer-alt"></i> <span class="nav-text">Dashboard</span></a>
+        <a href="profilei.php"><i class="fas fa-user"></i> <span class="nav-text">Profile</span></a>
         <a href="opportunities.php" class="active"><i class="fas fa-chart-line"></i> <span class="nav-text">Opportunities</span></a>
         <a href="reports.php"><i class="fas fa-file-alt"></i> <span class="nav-text">Reports</span></a>
         <a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span></a>
@@ -292,7 +292,19 @@ $sectors = $pdo->query("SELECT sector_id, name FROM sectors ORDER BY name")->fet
                         <td><?= htmlspecialchars($opp['title']) ?></td>
                         <td><?= htmlspecialchars($opp['sector_name']) ?></td>
                         <td><?= number_format($opp['capital_min'], 2) ?> - <?= number_format($opp['capital_max'], 2) ?></td>
-                        <td><?= ucfirst($opp['risk_level']) ?></td>
+                        <td>
+                            <?= ucfirst($opp['risk_level']) ?>
+                            <button class="ai-risk-btn" 
+                                data-opportunity-id="<?= $opp['opportunity_id'] ?>"
+                                data-sector="<?= htmlspecialchars($opp['sector_name']) ?>"
+                                data-capital-min="<?= htmlspecialchars($opp['capital_min']) ?>"
+                                data-capital-max="<?= htmlspecialchars($opp['capital_max']) ?>"
+                                data-timeline="<?= htmlspecialchars($opp['timeline_months']) ?>"
+                                style="margin-left:8px;padding:4px 10px;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.9em;">
+                                Assess Risk
+                            </button>
+                            <span class="ai-risk-result" style="margin-left:6px;font-weight:bold;"></span>
+                        </td>
                         <td><?= $opp['timeline_months'] ?></td>
                         <?php if ($user_type === 'admin'): ?>
                             <td><?= htmlspecialchars($opp['submitted_by']) ?></td>
@@ -305,5 +317,33 @@ $sectors = $pdo->query("SELECT sector_id, name FROM sectors ORDER BY name")->fet
         </tbody>
     </table>
             </main>
+<script>
+document.querySelectorAll('.ai-risk-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const opportunity_id = this.dataset.opportunityId;
+        const sector = this.dataset.sector;
+        const capital_min = this.dataset.capitalMin;
+        const capital_max = this.dataset.capitalMax;
+        const timeline = this.dataset.timeline;
+        const resultSpan = this.nextElementSibling;
+        resultSpan.textContent = '...';
+        fetch('ai_risk_assess.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ opportunity_id, sector, capital_min, capital_max, timeline })
+        })
+        .then(res => res.json())
+        .then(data => {
+            resultSpan.textContent = data.risk;
+            if(['low','medium','high'].includes(data.risk.toLowerCase())) {
+                this.parentElement.childNodes[0].textContent = data.risk.charAt(0).toUpperCase() + data.risk.slice(1);
+            }
+        })
+        .catch(() => {
+            resultSpan.textContent = 'Error';
+        });
+    });
+});
+</script>
 </body>
 </html>

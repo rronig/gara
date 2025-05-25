@@ -1,4 +1,64 @@
-<?php include_once('config.php'); ?>
+<?php
+include_once 'config.php';
+
+try {
+    $stmt = $pdo->query("SELECT * FROM sectors");
+    $sectors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
+
+$taxBenefitMin = $taxBenefitMax = null;
+$investment = 250000;
+$selectedSector = '';
+
+// Define tax benefit rates per sector (min, max)
+$taxRates = [
+    'ICT' => [0.015, 0.045],
+    'Tourism' => [0.02, 0.05],
+    'Healthcare' => [0.025, 0.06],
+    'Agriculture' => [0.025, 0.06],
+    'Processing' => [0.02, 0.05],
+    'Renewable Energy' => [0.03, 0.07]
+];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $investment = floatval($_POST['amount']);
+    $selectedSector = $_POST['sector'] ?? '';
+
+    // Fix: use $taxRates instead of $taxRatesBySector
+    if (isset($taxRates[$selectedSector])) {
+        $rates = $taxRates[$selectedSector];
+        $taxBenefitMin = round($investment * $rates[0], 2);
+        $taxBenefitMax = round($investment * $rates[1], 2);
+    } else {
+        // Default fallback if sector not found
+        $taxBenefitMin = round($investment * 0.01, 2);
+        $taxBenefitMax = round($investment * 0.03, 2);
+    }
+
+    // Store results in session to avoid resubmission on refresh
+    session_start();
+    $_SESSION['taxBenefitMin'] = $taxBenefitMin;
+    $_SESSION['taxBenefitMax'] = $taxBenefitMax;
+    $_SESSION['amount'] = $investment;
+    $_SESSION['sector'] = $selectedSector;
+
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+// After redirect, read session values and clear them
+session_start();
+if (isset($_SESSION['taxBenefitMin'], $_SESSION['taxBenefitMax'])) {
+    $taxBenefitMin = $_SESSION['taxBenefitMin'];
+    $taxBenefitMax = $_SESSION['taxBenefitMax'];
+    $investment = $_SESSION['amount'] ?? 250000;
+    $selectedSector = $_SESSION['sector'] ?? '';
+
+    unset($_SESSION['taxBenefitMin'], $_SESSION['taxBenefitMax'], $_SESSION['amount'], $_SESSION['sector']);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -135,51 +195,68 @@
                         Your gateway to business opportunities, incentives, and growth in one of Europe's most dynamic emerging markets.
                     </p>
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <a href="opportunities.php" class="bg-white text-blue-800 hover:bg-blue-100 px-6 py-3 rounded-md font-medium transition duration-300">
+                        <a href="opportunity-detail.php" class="bg-white text-blue-800 hover:bg-blue-100 px-6 py-3 rounded-md font-medium transition duration-300">
                             Explore Opportunities <i class="fas fa-search ml-2"></i>
                         </a>
-                        <button class="bg-transparent border-2 border-white hover:bg-white hover:text-blue-800 px-6 py-3 rounded-md font-medium transition duration-300">
-                            Watch Overview <i class="fas fa-play-circle ml-2"></i>
-                        </button>
                     </div>
                 </div>
-                <div class="md:w-1/2 relative">
-                    <div class="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl">
-                        <h3 class="text-xl font-semibold mb-4">Quick Investment Calculator</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1">Investment Sector</label>
-                                <select class="w-full px-4 py-2 rounded-md bg-white bg-opacity-20 border border-white border-opacity-30 text-white">
-                                    <option class="text-black">Manufacturing</option>
-                                    <option class="text-black">Information Technology</option>
-                                    <option class="text-black">Energy</option>
-                                    <option class="text-black">Agriculture</option>
-                                    <option class="text-black">Tourism</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">Investment Amount (€)</label>
-                                <input type="range" min="10000" max="1000000" step="10000" value="250000" class="w-full">
-                                <div class="flex justify-between text-xs">
-                                    <span>€10,000</span>
-                                    <span>€1,000,000</span>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">Expected Tax Benefits</label>
-                                <div class="bg-white bg-opacity-30 px-4 py-2 rounded-md">
-                                    <span class="font-bold">€15,000 - €45,000</span> annually
-                                </div>
-                            </div>
-                            <button class="w-full bg-white text-blue-800 hover:bg-blue-100 px-4 py-2 rounded-md font-medium transition duration-300">
-                                Calculate Full Benefits <i class="fas fa-calculator ml-2"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="absolute -bottom-6 -right-6 bg-yellow-400 text-blue-900 px-4 py-2 rounded-lg shadow-lg font-bold">
-                        <i class="fas fa-bolt mr-2"></i> Fast-Track Available
+                <form method="post" class="md:w-1/2 relative">
+    <div>
+        <div class="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl">
+            <h3 class="text-xl font-semibold mb-4">Quick Investment Calculator</h3>
+            <div class="space-y-4">
+                <!-- Sector Selection -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-white">Investment Sector</label>
+                    <select name="sector" class="w-full px-4 py-2 rounded-md bg-white bg-opacity-20 border border-white border-opacity-30 text-white"
+                        id="sector-select">
+                        <?php foreach($sectors as $sector): ?>
+                            <option class="text-black" value="<?= htmlspecialchars($sector['name']) ?>" <?= ($selectedSector === $sector['name']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($sector['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Investment Amount Slider -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-white">Investment Amount (€)</label>
+                    <input name="amount" type="range" min="10000" max="1000000" step="10000"
+                           value="<?= htmlspecialchars($investment) ?>" class="w-full">
+                    <div class="flex justify-between text-xs text-white">
+                        <span>€10,000</span>
+                        <span>€1,000,000</span>
                     </div>
                 </div>
+
+                <!-- Tax Benefit Result -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-white">Expected Tax Benefits</label>
+                    <div class="bg-white bg-opacity-30 px-4 py-2 rounded-md text-white">
+                        <?php if ($taxBenefitMin !== null): ?>
+                            <div class="result">
+                                <span><strong>€<?= number_format($taxBenefitMin, 2) ?> - €<?= number_format($taxBenefitMax, 2) ?></strong> annually</span>
+                            </div>
+                        <?php else: ?>
+                            <span>Enter amount and choose sector to estimate.</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type='submit' class="w-full bg-white text-blue-800 hover:bg-blue-100 px-4 py-2 rounded-md font-medium transition duration-300">
+                    Calculate Full Benefits <i class="fas fa-calculator ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Badge -->
+        <div class="absolute -bottom-6 -right-6 bg-yellow-400 text-blue-900 px-4 py-2 rounded-lg shadow-lg font-bold">
+            <i class="fas fa-bolt mr-2"></i> Fast-Track Available
+        </div>
+    </div>
+</form>
+
             </div>
         </div>
     </section>
@@ -229,88 +306,53 @@
                     Discover curated investment projects with high growth potential across Kosovo's most promising sectors
                 </p>
             </div>
-            
+
+            <?php
+            // Fetch opportunities with sector name
+            try {
+                $stmtOpp = $pdo->query("SELECT io.*, s.name as sector_name FROM investment_opportunities io LEFT JOIN sectors s ON io.sector_id = s.sector_id ORDER BY io.created_at DESC LIMIT 6");
+                $opportunities = $stmtOpp->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                $opportunities = [];
+            }
+            ?>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Opportunity Card 1 -->
-                <div class="card-hover bg-white rounded-xl overflow-hidden shadow-md transition duration-300">
-                    <div class="h-48 bg-blue-600 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-                             alt="Renewable Energy" class="w-full h-full object-cover">
-                        <div class="absolute top-4 right-4 bg-yellow-400 text-blue-900 px-3 py-1 rounded-full text-xs font-bold">
-                            <i class="fas fa-bolt mr-1"></i> High Priority
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-gray-900">Solar Power Plant</h3>
-                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">€25M</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">50MW photovoltaic plant in Kosovo's sun-rich southern region</p>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="text-sm text-gray-500"><i class="fas fa-map-marker-alt mr-1"></i> Prizren</span>
+                <?php foreach ($opportunities as $opp): ?>
+                    <div class="card-hover bg-white rounded-xl overflow-hidden shadow-md transition duration-300">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-gray-900"><?= htmlspecialchars($opp['title']) ?></h3>
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                                    €<?= number_format($opp['capital_max'], 0, '.', ',') ?>
+                                </span>
                             </div>
-                            <button class="text-blue-600 hover:text-blue-800 font-medium">
-                                View Details <i class="fas fa-arrow-right ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Opportunity Card 2 -->
-                <div class="card-hover bg-white rounded-xl overflow-hidden shadow-md transition duration-300">
-                    <div class="h-48 bg-blue-600 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1532619675605-1ede56544831?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-                             alt="IT Park" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-gray-900">Tech Innovation Hub</h3>
-                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">€15M</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">State-of-the-art technology park with incentives for IT companies</p>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="text-sm text-gray-500"><i class="fas fa-map-marker-alt mr-1"></i> Prishtina</span>
+                            <p class="text-gray-600 mb-4"><?= htmlspecialchars(mb_strimwidth($opp['description'], 0, 110, '...')) ?></p>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-sm text-gray-500">
+                                        <i class="fas fa-tags mr-1"></i>
+                                        <?= htmlspecialchars($opp['sector_name'] ?? 'N/A') ?>
+                                    </span>
+                                </div>
+                                <a href="opportunity-detail.php?id=<?= $opp['opportunity_id'] ?>" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    View Details <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
                             </div>
-                            <button class="text-blue-600 hover:text-blue-800 font-medium">
-                                View Details <i class="fas fa-arrow-right ml-1"></i>
-                            </button>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Opportunity Card 3 -->
-                <div class="card-hover bg-white rounded-xl overflow-hidden shadow-md transition duration-300">
-                    <div class="h-48 bg-blue-600 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1449300079323-02e209d9d3a4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-                             alt="Agro Processing" class="w-full h-full object-cover">
-                        <div class="absolute top-4 right-4 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-bold">
-                            <i class="fas fa-star mr-1"></i> New
-                        </div>
+                <?php endforeach; ?>
+                <?php if (empty($opportunities)): ?>
+                    <div class="col-span-3 text-center text-gray-500 py-12">
+                        No opportunities available at this time.
                     </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-gray-900">Organic Food Processing</h3>
-                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">€8M</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Modern facility for processing Kosovo's high-quality organic produce</p>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="text-sm text-gray-500"><i class="fas fa-map-marker-alt mr-1"></i> Ferizaj</span>
-                            </div>
-                            <button class="text-blue-600 hover:text-blue-800 font-medium">
-                                View Details <i class="fas fa-arrow-right ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <?php endif; ?>
             </div>
-            
+
             <div class="text-center mt-12">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition duration-300">
+                <a href="opportunity-detail.php" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition duration-300">
                     View All Opportunities <i class="fas fa-arrow-right ml-2"></i>
-                </button>
+                </a>
             </div>
         </div>
     </section>
@@ -326,61 +368,36 @@
             </div>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Sector Card 1 -->
-                <div class="sector-card bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-300 transition duration-300 cursor-pointer">
-                    <div class="sector-icon text-blue-600 text-4xl mb-4">
-                        <i class="fas fa-laptop-code"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Information Technology</h3>
-                    <p class="text-gray-600 mb-4">
-                        Thriving tech ecosystem with skilled, English-speaking workforce and competitive costs
-                    </p>
-                    <div class="text-blue-600 font-medium">
-                        Explore <i class="fas fa-arrow-right ml-1"></i>
-                    </div>
-                </div>
-                
-                <!-- Sector Card 2 -->
-                <div class="sector-card bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-300 transition duration-300 cursor-pointer">
-                    <div class="sector-icon text-blue-600 text-4xl mb-4">
-                        <i class="fas fa-solar-panel"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Renewable Energy</h3>
-                    <p class="text-gray-600 mb-4">
-                        Abundant solar, wind, and hydro resources with government incentives for green energy
-                    </p>
-                    <div class="text-blue-600 font-medium">
-                        Explore <i class="fas fa-arrow-right ml-1"></i>
-                    </div>
-                </div>
-                
-                <!-- Sector Card 3 -->
-                <div class="sector-card bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-300 transition duration-300 cursor-pointer">
-                    <div class="sector-icon text-blue-600 text-4xl mb-4">
-                        <i class="fas fa-utensils"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Agribusiness</h3>
-                    <p class="text-gray-600 mb-4">
-                        Fertile land, organic potential, and growing demand for high-quality food products
-                    </p>
-                    <div class="text-blue-600 font-medium">
-                        Explore <i class="fas fa-arrow-right ml-1"></i>
-                    </div>
-                </div>
-                
-                <!-- Sector Card 4 -->
-                <div class="sector-card bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-300 transition duration-300 cursor-pointer">
-                    <div class="sector-icon text-blue-600 text-4xl mb-4">
-                        <i class="fas fa-hotel"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Tourism</h3>
-                    <p class="text-gray-600 mb-4">
-                        Untapped potential in cultural, adventure, and mountain tourism with growing visitor numbers
-                    </p>
-                    <div class="text-blue-600 font-medium">
-                        Explore <i class="fas fa-arrow-right ml-1"></i>
-                    </div>
-                </div>
+                <?php foreach ($sectors as $sector): ?>
+                    <a href="sector-detail.php?id=<?= $sector['sector_id'] ?>" class="sector-card bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-300 transition duration-300 cursor-pointer block">
+                        <div class="sector-icon text-blue-600 text-4xl mb-4">
+                            <?php
+                            // Simple icon mapping by sector name (customize as needed)
+                            $iconMap = [
+                                'Information Technology' => 'fa-laptop-code',
+                                'ICT' => 'fa-laptop-code',
+                                'Renewable Energy' => 'fa-solar-panel',
+                                'Agriculture' => 'fa-utensils',
+                                'Agribusiness' => 'fa-utensils',
+                                'Tourism' => 'fa-hotel',
+                                'Healthcare' => 'fa-heartbeat',
+                                'Processing' => 'fa-industry',
+                            ];
+                            $icon = $iconMap[$sector['name']] ?? 'fa-industry';
+                            ?>
+                            <i class="fas <?= $icon ?>"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">
+                            <?= htmlspecialchars($sector['name']) ?>
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <?= htmlspecialchars(mb_strimwidth($sector['description'] ?? '', 0, 90, '...')) ?>
+                        </p>
+                        <div class="text-blue-600 font-medium">
+                            Explore <i class="fas fa-arrow-right ml-1"></i>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
@@ -583,27 +600,9 @@
             </div>
             
             <div class="text-center mt-12">
-                <button class="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-md font-medium transition duration-300">
+                <a href="success-stories.php" class="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-md font-medium transition duration-300">
                     View More Success Stories <i class="fas fa-arrow-right ml-2"></i>
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="py-16 bg-blue-800 text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl font-bold mb-6">Ready to Explore Kosovo's Opportunities?</h2>
-            <p class="text-xl text-blue-200 mb-8 max-w-3xl mx-auto">
-                Our dedicated investment team is ready to assist you with personalized guidance and support
-            </p>
-            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                <button class="bg-white text-blue-800 hover:bg-blue-100 px-8 py-3 rounded-md font-medium transition duration-300">
-                    Contact Our Team <i class="fas fa-envelope ml-2"></i>
-                </button>
-                <button class="bg-transparent border-2 border-white hover:bg-white hover:text-blue-800 px-8 py-3 rounded-md font-medium transition duration-300">
-                    Schedule Consultation <i class="fas fa-calendar-alt ml-2"></i>
-                </button>
+                </a>
             </div>
         </div>
     </section>
@@ -700,72 +699,63 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-lg font-bold mb-4">InvestKosovo Hub</h3>
-                    <p class="text-gray-400">
-                        Your comprehensive gateway to investment opportunities in Kosovo, supported by the Government of Kosovo.
-                    </p>
-                    <div class="flex space-x-4 mt-4">
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-linkedin"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-youtube"></i>
-                        </a>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white">Investment Guide</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Legal Framework</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Sector Reports</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Tax Incentives</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">FAQs</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold mb-4">Resources</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white">Market Research</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Investment Maps</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Business Registration</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Visa Information</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">News & Updates</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold mb-4">Newsletter</h3>
-                    <p class="text-gray-400 mb-4">
-                        Subscribe to receive the latest investment opportunities and updates from Kosovo.
-                    </p>
-                    <form class="flex">
-                        <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l-md text-gray-900 w-full">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-md">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </form>
-                </div>
+    <footer class="bg-gray-900 text-white py-12 px-6">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-xl font-bold mb-4 flex items-center">
+                    <img class="h-12 w-auto" src="kosova1.png" alt="InvestKosovo Logo">InvestKosovo
+                </h3>
+                <p class="text-gray-400">Connecting investors with Kosovo's most promising opportunities since 2018.</p>
             </div>
-            <div class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 text-sm">
-                    © 2023 InvestKosovo Hub. All rights reserved.
-                </p>
-                <div class="flex space-x-6 mt-4 md:mt-0">
-                    <a href="#" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
-                    <a href="#" class="text-gray-400 hover:text-white text-sm">Terms of Service</a>
-                    <a href="#" class="text-gray-400 hover:text-white text-sm">Cookies</a>
-                </div>
+            <div>
+                <h4 class="font-semibold mb-4">Opportunities</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <?php
+                        // Fetch opportunities with sector name
+                        try {
+                            $stmtOpp = $pdo->query("SELECT io.*, s.name as sector_name FROM investment_opportunities io LEFT JOIN sectors s ON io.sector_id = s.sector_id ORDER BY io.created_at DESC LIMIT 6");
+                            $opportunities = $stmtOpp->fetchAll(PDO::FETCH_ASSOC);
+                        } catch (PDOException $e) {
+                            $opportunities = [];
+                        }
+                        foreach ($opportunities as $o):
+                    ?>
+                        <li>
+                            <a href="opportunity-detail.php?id=<?= $o['opportunity_id'] ?>" class="hover:text-white transition-colors">
+                                <?= htmlspecialchars($o['title']) ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
             </div>
+            <div>
+                <h4 class="font-semibold mb-4">Sectors</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <?php foreach ($sectors as $s): ?>
+                    <li>
+                        <a href="sector-detail.php?id=<?= $s['sector_id'] ?>" class="hover:text-white transition-colors">
+                            <?= htmlspecialchars($s['name']) ?>
+                        </a>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-4">Contact</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li class="flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2 text-indigo-400"></i> Prishtina, Kosovo
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-phone-alt mr-2 text-indigo-400"></i> +383 49 123 456
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-envelope mr-2 text-indigo-400"></i> info@investkosovo.com
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-6xl mx-auto pt-8 mt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+            <p>© 2025 InvestKosovo. All rights reserved.</p>
         </div>
     </footer>
 
@@ -814,6 +804,11 @@
 
         document.querySelectorAll('.card-hover, .sector-card, .testimonial-card, .stat-card').forEach(card => {
             observer.observe(card);
+        });
+
+        // Auto-submit calculator form when sector changes
+        document.getElementById('sector-select').addEventListener('change', function() {
+            this.form.submit();
         });
     </script>
 </body>

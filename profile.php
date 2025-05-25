@@ -211,8 +211,8 @@ if (!$user) {
         </div>
     </div>
     <nav>
-        <a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span class="nav-text">Dashboard</span></a>
-        <a href="profile.php" class="active"><i class="fas fa-user"></i> <span class="nav-text">Profile</span></a>
+        <a href="dashboardi.php"><i class="fas fa-tachometer-alt"></i> <span class="nav-text">Dashboard</span></a>
+        <a href="profilei.php" class="active"><i class="fas fa-user"></i> <span class="nav-text">Profile</span></a>
         <a href="opportunities.php"><i class="fas fa-chart-line"></i> <span class="nav-text">Opportunities</span></a>
         <a href="reports.php"><i class="fas fa-file-alt"></i> <span class="nav-text">Reports</span></a>
         <a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span></a>

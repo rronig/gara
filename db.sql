@@ -10,9 +10,19 @@ CREATE TABLE users (
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    user_type ENUM('investor','admin') DEFAULT 'investor',
+    user_type ENUM('investor','admin','expert') DEFAULT 'investor',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    last_login DATETIME
+    last_login DATETIME,
+    address VARCHAR(255),
+    phone VARCHAR(50),
+    city VARCHAR(100),
+    country VARCHAR(100),
+    profile_picture VARCHAR(255),
+    total_value DECIMAL(15,2),
+    total_invested DECIMAL(15,2),
+    risk_profile VARCHAR(50),
+    investments_made INT DEFAULT 0,
+    email_verified TINYINT(1) DEFAULT 0
 );
 
 -- Sectors Table
@@ -35,6 +45,14 @@ CREATE TABLE investment_opportunities (
     contact_email VARCHAR(150) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sector_id) REFERENCES sectors(sector_id)
+);
+
+CREATE TABLE success_stories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    description TEXT NOT NULL,
+    rating INT NOT NULL CHECK (rating BETWEEN 0 AND 5),
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- Analytics Data Table
