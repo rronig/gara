@@ -24,7 +24,7 @@ if (!$user) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Your Profile - InvestKosovo Hub</title>
+    <title>Your Profile - InvestKosovo</title>
     <style>
         /* Reset and base */
         * {

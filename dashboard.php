@@ -21,7 +21,7 @@ function fetchSingleValue($pdo, $sql, $params = []) {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Dashboard - InvestKosovo Hub</title>
+    <title>Dashboard - InvestKosovo</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
     <style>
         /* Reset and base */
@@ -218,7 +218,7 @@ function fetchSingleValue($pdo, $sql, $params = []) {
 </div>
 
 <main class="content" id="mainContent">
-    <h1>Welcome to InvestKosovo Hub Dashboard</h1>
+    <h1>Welcome to InvestKosovo Dashboard</h1>
         <script>
             console.log(<?= json_encode($user_type) ?>);
         </script>

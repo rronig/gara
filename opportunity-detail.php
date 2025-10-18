@@ -146,7 +146,7 @@ if (!$opp && count($opps)) {
         <div class="flex items-center">
             <a href="index.php" class="flex items-center text-gray-800 hover:text-indigo-600 transition-colors">
                 <img class="h-16 w-auto" src="kosova.png" alt="InvestKosovo Logo">            
-                <span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InvestKosovo Hub</span>
+                <span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InvestKosovo</span>
             </a>
             <!-- Opportunity Selector Dropdown (between logo and Home) -->
             <form method="get" class="ml-6">

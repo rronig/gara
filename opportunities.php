@@ -48,7 +48,7 @@ $sectors = $pdo->query("SELECT sector_id, name FROM sectors ORDER BY name")->fet
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Investment Opportunities - InvestKosovo Hub</title>
+    <title>Investment Opportunities - InvestKosovo</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
     <style>
         /* Reset and base */

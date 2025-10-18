@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Log In - InvestKosovo Hub</title>
+    <title>Log In - InvestKosovo</title>
     <style>
         body {
             font-family: 'Poppins', Arial, sans-serif;

@@ -64,7 +64,7 @@ if (isset($_SESSION['taxBenefitMin'], $_SESSION['taxBenefitMax'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InvestKosovo Hub | Gateway to Investment Opportunities</title>
+    <title>InvestKosovo | Gateway to Investment Opportunities</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -146,7 +146,7 @@ if (isset($_SESSION['taxBenefitMin'], $_SESSION['taxBenefitMax'])) {
                 <div class="flex items-center">
                     <div class="flex-shrink-0 flex items-center">
                         <img class="h-16 w-auto" src="kosova.png" alt="InvestKosovo Logo">
-                        <a href="index.php"><span class="ml-2 text-xl font-bold text-blue-800">InvestKosovo Hub</span></a>
+                        <a href="index.php"><span class="ml-2 text-xl font-bold text-blue-800">InvestKosovo</span></a>
                     </div>
                 </div>
                 <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
@@ -415,7 +415,7 @@ if (isset($_SESSION['taxBenefitMin'], $_SESSION['taxBenefitMax'])) {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <div class="bg-white rounded-xl p-8 shadow-md mb-8">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Strategic Location</h3>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Headquarters location</h3>
                         <div class="map-container flex items-center justify-center">
                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1504723.988982643!2d19.582584950376067!3d42.55711810215074!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13537af354bf7df1%3A0xbfffeedfabc31791!2sKosovo!5e0!3m2!1sen!2s!4v1748086164375!5m2!1sen!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>

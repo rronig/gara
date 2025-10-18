@@ -45,7 +45,7 @@ foreach ($users as $u) {
         <div class="flex items-center">
             <a href="index.php" class="flex items-center text-gray-800 hover:text-blue-600 transition-colors">
                 <img class="h-16 w-auto" src="kosova.png" alt="InvestKosovo Logo">
-                <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent ml-2">InvestKosovo Hub</span>
+                <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent ml-2">InvestKosovo</span>
             </a>
         </div>
         <div class="flex items-center space-x-6">
