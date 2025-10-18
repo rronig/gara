@@ -166,14 +166,9 @@ if (!$opp && count($opps)) {
             <a href="index.php#opportunities" class="text-gray-600 hover:text-indigo-600 transition-colors">
                 <i class="fas fa-briefcase mr-1"></i> Opportunities
             </a>
-            <a href="profilei.php" class="text-gray-600 hover:text-indigo-600 transition-colors">
+            <a href="profilei.php" class="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors">
                 <i class="fas fa-user mr-1"></i> Account
             </a>
-            <?php if (!isset($_SESSION['user'])){ ?>
-                <a href="login.php" class="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors">
-                    <i class="fas fa-sign-in-alt mr-2"></i> Login
-                </a>
-            <?php }else{} ?>
         </div>
     </nav>
 
@@ -199,15 +194,17 @@ if (!$opp && count($opps)) {
                         <div>
                             <p class="text-sm text-indigo-100">Funding Goal</p>
                             <p class="text-2xl font-bold">€
-                                <?= number_format($opp['capital_max'] ?? 0, 0, '.', ',') ?>
+                                <?= number_format($opp['goal'] ?? 0, 0, '.', ',') ?>
                             </p>
                         </div>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
                         <?php
-                        // For demo, fake 72% funded. In real, calculate from investments table.
-                        $percent = 72;
-                        $raised = ($opp['capital_max'] ?? 0) * $percent / 100;
+                        // Calculate percent funded using money_raised and goal
+                        $moneyRaised = isset($opp['money_raised']) ? (float)$opp['money_raised'] : 0;
+                        $goal = isset($opp['goal']) ? (float)$opp['goal'] : 0;
+                        $percent = ($goal > 0) ? min(100, round(($moneyRaised / $goal) * 100)) : 0;
+                        $raised = $moneyRaised;
                         ?>
                         <div class="progress-bar rounded-full h-2" style="--progress-width: <?= $percent ?>%; width: <?= $percent ?>%;"></div>
                     </div>
