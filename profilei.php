@@ -211,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password_submi
                     </a>
                 </div>
                 <div class="px-4 py-2 hover:bg-blue-700">
-                    <a href="opportunities.php" class="flex items-center text-white">
+                    <a href="opportunity.php" class="flex items-center text-white">
                         <i class="fas fa-chart-line mr-3"></i>
                         <span class="nav-text">Opportunities</span>
                     </a>

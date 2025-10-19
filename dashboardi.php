@@ -113,7 +113,7 @@ function fetchSingleValue($pdo, $sql, $params = []) {
                     </a>
                 </div>
                 <div class="px-4 py-2 hover:bg-blue-700">
-                    <a href="opportunities.php" class="flex items-center text-white">
+                    <a href="opportunity.php" class="flex items-center text-white">
                         <i class="fas fa-chart-line mr-3"></i>
                         <span class="nav-text">Opportunities</span>
                     </a>
@@ -358,7 +358,7 @@ function fetchSingleValue($pdo, $sql, $params = []) {
                             </table>
                         </div>
                         <div class="p-4 border-t text-center">
-                            <a href="opportunities.php" class="text-purple-700 hover:text-purple-900 font-medium">View All Diaspora Opportunities</a>
+                            <a href="opportunity.php" class="text-purple-700 hover:text-purple-900 font-medium">View All Diaspora Opportunities</a>
                         </div>
                     </div>
                     <!-- Diaspora News -->

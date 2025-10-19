@@ -81,7 +81,7 @@ if (!$sector && count($sectors)) {
             <a href="index.php" class="text-gray-600 hover:text-green-600 transition-colors">
                 <i class="fas fa-home mr-1"></i> Home
             </a>
-            <a href="opportunities.php" class="text-gray-600 hover:text-green-600 transition-colors">
+            <a href="opportunity.php" class="text-gray-600 hover:text-green-600 transition-colors">
                 <i class="fas fa-briefcase mr-1"></i> Opportunities
             </a>
             <a href="#" class="text-gray-600 hover:text-green-600 transition-colors">

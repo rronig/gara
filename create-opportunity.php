@@ -22,14 +22,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $risk_level = $_POST['risk_level'] ?? '';
     $timeline_months = intval($_POST['timeline_months'] ?? 0);
     $contact_email = trim($_POST['contact_email'] ?? '');
-    $active = isset($_POST['active']) ? 1 : 0;
 
     if ($title && $description && $sector_id && $capital_min > 0 && $capital_max > 0 && $risk_level && $timeline_months > 0 && $contact_email) {
-        $stmt = $pdo->prepare("INSERT INTO investment_opportunities (title, sector_id, capital_min, capital_max, risk_level, timeline_months, description, contact_email, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        if ($stmt->execute([$title, $sector_id, $capital_min, $capital_max, $risk_level, $timeline_months, $description, $contact_email, $active])) {
+        $stmt = $pdo->prepare("INSERT INTO investment_opportunities (title, sector_id, capital_min, capital_max, risk_level, timeline_months, description, contact_email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        try {
+            $stmt->execute([$title, $sector_id, $capital_min, $capital_max, $risk_level, $timeline_months, $description, $contact_email]);
             $success = true;
-        } else {
-            $error = 'Database error. Please try again.';
+        } catch (PDOException $e) {
+            // This will show the real error
+            $error = 'Database error: ' . $e->getMessage();
         }
     } else {
         $error = 'Please fill in all required fields.';
@@ -97,10 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
                 <input type="email" name="contact_email" class="w-full px-4 py-2 rounded-md border border-gray-300" required>
-            </div>
-            <div class="flex items-center">
-                <input type="checkbox" name="active" id="active" class="mr-2" checked>
-                <label for="active" class="text-sm text-gray-700">Active</label>
             </div>
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-bold transition">Create Opportunity</button>
         </form>

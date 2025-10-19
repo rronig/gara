@@ -58,6 +58,18 @@ if (isset($_SESSION['taxBenefitMin'], $_SESSION['taxBenefitMax'])) {
 
     unset($_SESSION['taxBenefitMin'], $_SESSION['taxBenefitMax'], $_SESSION['amount'], $_SESSION['sector']);
 }
+$stories = $pdo->query("SELECT * FROM success_stories ORDER BY user_id")->fetchAll(PDO::FETCH_ASSOC);
+$ratings = $pdo->query("SELECT rating FROM success_stories ORDER BY user_id")->fetchAll(PDO::FETCH_ASSOC);
+$users = $pdo->query("SELECT * FROM users ORDER BY user_id")->fetchAll(PDO::FETCH_ASSOC);
+// Build user_id => full_name and user_id => profile_picture maps
+$userNameMap = [];
+$userPicMap = [];
+$userTypeMap = [];
+foreach ($users as $u) {
+    $userNameMap[$u['user_id']] = $u['full_name'];
+    $userPicMap[$u['user_id']] = $u['profile_picture'];
+    $userTypeMap[$u['user_id']] = $u['user_type'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -532,71 +544,25 @@ if (isset($_SESSION['taxBenefitMin'], $_SESSION['taxBenefitMax'])) {
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Testimonial 1 -->
+                <?php foreach ($stories as $story): ?>
                 <div class="testimonial-card bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition duration-300">
                     <div class="flex items-center mb-4">
-                        <img class="w-12 h-12 rounded-full mr-4" src="https://randomuser.me/api/portraits/women/43.jpg" alt="Sarah Johnson">
+                        <img class="w-12 h-12 rounded-full mr-4" src="<?php echo htmlspecialchars($userPicMap[$story['user_id']] ?? 'uploads/profile_1.png'); ?>" alt="Profile Picture">
                         <div>
-                            <h4 class="font-bold text-gray-900">Sarah Johnson</h4>
-                            <p class="text-gray-600 text-sm">CEO, TechSolutions Europe</p>
+                            <h4 class="font-bold text-gray-900"><?php echo htmlspecialchars($userNameMap[$story['user_id']] ?? 'Unknown User'); ?></h4>
+                            <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($userTypeMap[$story['user_id']]); ?></p>
                         </div>
                     </div>
-                    <p class="text-gray-700 mb-4 italic">
-                        "Setting up our regional IT hub in Prishtina was the best decision we made. The talent pool exceeded our expectations, and the cost savings allowed us to scale rapidly."
-                    </p>
+                    <p class="text-gray-700 mb-4 italic"><?php echo htmlspecialchars($story['description']); ?></p>
                     <div class="flex items-center text-yellow-400">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <span class="text-gray-600 ml-2 text-sm">5/5</span>
+                        <?php for ($i = 0; $i < (int)$story['rating']; $i++): ?>
+                            <i class="fas fa-star"></i>
+                        <?php endfor; ?>
+
+                        <span class="text-gray-600 ml-2 text-sm"><?php echo htmlspecialchars($story['rating']); ?>/5</span>
                     </div>
                 </div>
-                
-                <!-- Testimonial 2 -->
-                <div class="testimonial-card bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition duration-300">
-                    <div class="flex items-center mb-4">
-                        <img class="w-12 h-12 rounded-full mr-4" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Michael Bauer">
-                        <div>
-                            <h4 class="font-bold text-gray-900">Michael Bauer</h4>
-                            <p class="text-gray-600 text-sm">Managing Director, GreenEnergy AG</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-700 mb-4 italic">
-                        "The solar energy potential in Kosovo is outstanding. With government support and excellent solar irradiation levels, our 20MW plant is performing above projections."
-                    </p>
-                    <div class="flex items-center text-yellow-400">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span class="text-gray-600 ml-2 text-sm">4.5/5</span>
-                    </div>
-                </div>
-                
-                <!-- Testimonial 3 -->
-                <div class="testimonial-card bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition duration-300">
-                    <div class="flex items-center mb-4">
-                        <img class="w-12 h-12 rounded-full mr-4" src="https://randomuser.me/api/portraits/women/65.jpg" alt="Elena Ricci">
-                        <div>
-                            <h4 class="font-bold text-gray-900">Elena Ricci</h4>
-                            <p class="text-gray-600 text-sm">Founder, Organic Delights</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-700 mb-4 italic">
-                        "Kosovo's organic agriculture sector is a hidden gem. We've been able to source premium raw materials at competitive prices for our European markets."
-                    </p>
-                    <div class="flex items-center text-yellow-400">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <span class="text-gray-600 ml-2 text-sm">5/5</span>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
             
             <div class="text-center mt-12">

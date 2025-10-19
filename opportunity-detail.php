@@ -142,37 +142,57 @@ if (!$opp && count($opps)) {
 </head>
 <body class="min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg py-4 px-6 flex justify-between items-center">
-        <div class="flex items-center">
-            <a href="index.php" class="flex items-center text-gray-800 hover:text-indigo-600 transition-colors">
-                <img class="h-16 w-auto" src="kosova.png" alt="InvestKosovo Logo">            
-                <span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InvestKosovo</span>
-            </a>
-            <!-- Opportunity Selector Dropdown (between logo and Home) -->
-            <form method="get" class="ml-6">
-                <select id="opp-select" name="id" class="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-indigo-400" onchange="this.form.submit()">
-                    <?php foreach ($opps as $o): ?>
-                        <option value="<?= $o['opportunity_id'] ?>" <?= $selected_id == $o['opportunity_id'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($o['title']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </form>
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <img class="h-16 w-auto" src="kosova.png" alt="InvestKosovo Logo">
+                        <a href="index.php"><span class="ml-2 text-xl font-bold text-blue-800">InvestKosovo</span></a>
+                    </div>
+                </div>
+                <form method="get" class="ml-6">
+                    <select id="opp-select" name="id" class="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-indigo-400" onchange="this.form.submit()">
+                        <?php foreach ($opps as $o): ?>
+                            <option value="<?= $o['opportunity_id'] ?>" <?= $selected_id == $o['opportunity_id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($o['title']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
+                <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
+                    <a href="#opportunities" class="animated-underline text-gray-700 hover:text-blue-800 px-3 py-2 text-sm font-medium">Opportunities</a>
+                    <a href="#sectors" class="animated-underline text-gray-700 hover:text-blue-800 px-3 py-2 text-sm font-medium">Key Sectors</a>
+                    <a href="#benefits" class="animated-underline text-gray-700 hover:text-blue-800 px-3 py-2 text-sm font-medium">Benefits</a>
+                    <a href="#testimonials" class="animated-underline text-gray-700 hover:text-blue-800 px-3 py-2 text-sm font-medium">Success Stories</a>
+                    <a href="#contact" class="animated-underline text-gray-700 hover:text-blue-800 px-3 py-2 text-sm font-medium">Contact</a>
+                    <a href="signin.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">
+                        Investor Portal <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="-mr-2 flex items-center md:hidden">
+                    <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="flex items-center space-x-6">
-            <a href="index.php" class="text-gray-600 hover:text-indigo-600 transition-colors">
-                <i class="fas fa-home mr-1"></i> Home
-            </a>
-            <a href="index.php#opportunities" class="text-gray-600 hover:text-indigo-600 transition-colors">
-                <i class="fas fa-briefcase mr-1"></i> Opportunities
-            </a>
-            <a href="profilei.php" class="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition-colors">
-                <i class="fas fa-user mr-1"></i> Account
-            </a>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#opportunities" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-800 hover:bg-gray-50">Opportunities</a>
+                <a href="#sectors" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-800 hover:bg-gray-50">Key Sectors</a>
+                <a href="#benefits" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-800 hover:bg-gray-50">Benefits</a>
+                <a href="#testimonials" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-800 hover:bg-gray-50">Success Stories</a>
+                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-800 hover:bg-gray-50">Contact</a>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-base font-medium mt-2 transition duration-300">
+                    Investor Portal <i class="fas fa-arrow-right ml-1"></i>
+                </button>
+            </div>
         </div>
     </nav>
-
-    <!-- Opportunity Header -->
     <div class="opportunity-header rounded-b-3xl text-white py-12 px-8 md:px-16 mb-12 fade-in">
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center">

@@ -21,6 +21,34 @@ foreach ($users as $u) {
     $userPicMap[$u['user_id']] = $u['profile_picture'];
     $userTypeMap[$u['user_id']] = $u['user_type'];
 }
+$submissionError = '';
+$submissionSuccess = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_story'])) {
+    $title = trim($_POST['title'] ?? '');               // <-- added to avoid undefined variable
+    $description = trim($_POST['description'] ?? '');
+    $rating = isset($_POST['rating']) ? (int)$_POST['rating'] : 5;
+
+    if ($description === '') {
+        $submissionError = 'Please enter a description for your success story.';
+    } elseif ($rating < 0 || $rating > 5) {
+        $submissionError = 'Rating must be between 0 and 5.';
+    } else {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO success_stories (user_id, title, description, rating) VALUES (?, ?, ?, ?)");
+            if ($stmt->execute([ $user_id, $title, $description, $rating ])) {
+                // simple PRG to avoid duplicate submissions
+                header('Location: success-stories.php');
+                exit;
+            } else {
+                $submissionError = 'Unable to save your story. Please try again later.';
+            }
+        } catch (PDOException $e) {
+            // log the real error for debugging, show generic error to user
+            error_log('success-stories insert error: ' . $e->getMessage());
+            $submissionError = 'Unable to save your story. Please try again later.';
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -82,6 +110,34 @@ foreach ($users as $u) {
                 </div>
             </div>
             <?php endforeach; ?>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-6 pb-6">
+        <div class="bg-white rounded-2xl p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Leave a review</h3>
+
+            <?php if ($submissionError): ?>
+                <div class="mb-4 text-red-600"><?= htmlspecialchars($submissionError) ?></div>
+            <?php endif; ?>
+
+            <form method="post" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Your Story</label>
+                    <textarea name="description" rows="4" class="w-full border rounded px-3 py-2" required></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                    <select name="rating" class="border rounded px-3 py-2">
+                        <?php for ($r = 5; $r >= 0; $r--): ?>
+                            <option value="<?= $r ?>"><?= $r ?>/5</option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" name="submit_story" class="bg-blue-600 text-white px-4 py-2 rounded">Submit Story</button>
+                </div>
+            </form>
         </div>
     </div>
 

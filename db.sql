@@ -213,7 +213,6 @@ INSERT INTO `sectors` (`sector_id`, `name`, `description`) VALUES
 CREATE TABLE `success_stories` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `rating` int(11) NOT NULL CHECK (`rating` between 0 and 5)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -222,9 +221,9 @@ CREATE TABLE `success_stories` (
 -- Dumping data for table `success_stories`
 --
 
-INSERT INTO `success_stories` (`id`, `user_id`, `title`, `description`, `rating`) VALUES
-(1, 1, '', '\"Kosovo\'s organic agriculture sector is a hidden gem. We\'ve been able to source premium raw materials at competitive prices for our European markets.\"', 5),
-(2, 2, '', '\"This website is terrific!\"', 5);
+INSERT INTO `success_stories` (`id`, `user_id`, `description`, `rating`) VALUES
+(1, 1, '\"Kosovo\'s organic agriculture sector is a hidden gem. We\'ve been able to source premium raw materials at competitive prices for our European markets.\"', 5),
+(2, 2, '\"This website is terrific!\"', 5);
 
 -- --------------------------------------------------------
 

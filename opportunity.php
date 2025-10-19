@@ -140,7 +140,7 @@ $investmentTypes = ['Equity', 'Debt', 'Crowdfunding', 'Government Grants'];
             </div>
             <nav class="mt-6">
                 <div class="px-4 py-2 hover:bg-blue-700">
-                    <a href="dashboard.php" class="flex items-center text-white">
+                    <a href="dashboardi.php" class="flex items-center text-white">
                         <i class="fas fa-tachometer-alt mr-3"></i>
                         <span class="nav-text">Dashboard</span>
                     </a>
@@ -152,7 +152,7 @@ $investmentTypes = ['Equity', 'Debt', 'Crowdfunding', 'Government Grants'];
                     </a>
                 </div>
                 <div class="px-4 py-2 fafaroni">
-                    <a href="opportunities.php" class="flex items-center text-white">
+                    <a href="opportunity.php" class="flex items-center text-white">
                         <i class="fas fa-chart-line mr-3"></i>
                         <span class="nav-text">Opportunities</span>
                     </a>
